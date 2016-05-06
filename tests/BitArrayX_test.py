@@ -67,6 +67,10 @@ if __name__ == '__main__':
             self.assertEqual(int(b), 0b111000)
             self.assertEqual(int(b), BitArrayX('0b111000'))
 
+        def test_repeat(self):
+            b = BitArrayX('0b01') * 2
+            self.assertEqual(b, BitArrayX('0b0101'))
+
         def test_logic(self):
             # and
             a, b, t = [BitArrayX('0b'+s) for s in load_truth_table("truthtables/and.txt")]
@@ -103,6 +107,7 @@ if __name__ == '__main__':
             self.assertEqual(x[0], 0)
             self.assertEqual(x[1], 1)
             self.assertEqual(x[3], 1)
+            self.assertTrue(x[3] == BitArrayX.true())
             self.assertEqual(x[0:2], BitArrayX('0b10'))
             self.assertEqual(x[0:3], BitArrayX('0b010'))
             with self.assertRaises(IndexError):

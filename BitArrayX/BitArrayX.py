@@ -19,6 +19,18 @@ class BitArrayX(object):
     _xor = {'0': {'0':'0', '1':'1', 'x':'x'}, '1': {'0':'1', '1':'0', 'x':'x'}, 'x': {'0':'x', '1':'x', 'x':'x'}}
     _not = {'0': '1', '1':'0', 'x':'x'}
 
+    @staticmethod
+    def undef():
+        return BitArrayX('0bx')
+
+    @staticmethod
+    def true():
+        return BitArrayX('0b1')
+
+    @staticmethod
+    def false():
+        return BitArrayX('0b')
+
     def __init__(self, x, array_len=None):
         """ Construct BitArrayX
         :param x:
@@ -79,6 +91,9 @@ class BitArrayX(object):
 
     def __add__(self, other):
         return BitArrayX('0b' + self._array + other._array)
+
+    def __mul__(self, n):
+        return BitArrayX('0b' + self._array * n)
 
     def __eq__(self, other):
         if isinstance(other, BitArrayX):

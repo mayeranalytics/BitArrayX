@@ -3,7 +3,7 @@
 ### Overview ###
 
 BitArrayX is a pure python module for easy manipulation of 
-binary arrays of arbitrary length with *extended logic*.
+ arrays of *extended boolean logic*.
 For most purpuses, in particular when you don't need extended logic,
 the [bitstring](http://pythonhosted.org/bitstring/) module 
 should be your first choice. It is extensive and well tested.
@@ -24,7 +24,7 @@ See the wikipedia article on [three-valued logic](https://en.wikipedia.org/wiki/
 
 The truth tables for `AND` and `OR` are as follows.
 
-| `AND`   | 0 | 1 | x |
+| `AND` | 0 | 1 | x |
 |-------|---|---|---|
 | **0** | 0 | 0 | 0 |
 | **1** | 0 | 1 | x |
@@ -64,7 +64,7 @@ If instantiated from a
 integer number the bitarray has the shortest necessary length:
 
 ```python
->>> b = BitArrayX(10)
+>>> b = BitArrayX(10)   # decimal ten
 >>> b
 BitArrayX(1010)
 ```
@@ -118,6 +118,19 @@ BitArrayX(000111111)
 >>> len(b)
 9
 ```
+
+### Basic operations ###
+
+```python
+>>> b = BitArrayX('0b0x1x0')
+>>> b + BitArrayX('0bx')       # concatenation 
+BitArrayX(0x1x0x)
+>>> len(b)                     # length of bitarray
+5
+>>> BitArray('0bx') * 8        # repetition
+BitArray('0bxxxxxxxx')
+```
+
 
 ### Logic ###
 
@@ -181,6 +194,16 @@ BitArrayX(xxxxx)
 
 ```
 
+### Other functionality ###
+```python
+>>> b = BitArrayX('0bx010x')
+>>> b.toList()      # returns a list of 0, 1, None
+[None, 0, 1, 0, None]
+>>> b == BitArrayX('0bx010x')   # comparison
+True
+>>> b == BitArrayX('0b00x010x')   # different length implies inequality
+```
+
 # Dependencies
 None.
 
@@ -196,7 +219,7 @@ The license is [GNU GPL](http://www.gnu.org/licenses/gpl-3.0.en.html).
 You may copy, distribute and modify the software as long as you track changes/dates in source files. 
 Any modifications to or software including (via compiler) GPL-licensed code must also be made available under 
 the GPL along with build & install instructions.
-([Software Licenses in Plain English](https://tldrlegal.com/license/gnu-general-public-license-v3-(gpl-3))
+(See [Software Licenses in Plain English](https://tldrlegal.com/license/gnu-general-public-license-v3-(gpl-3)))
 
 ### Long version
 BitArrayX is free software: you can redistribute it and/or modify it under the terms of the 

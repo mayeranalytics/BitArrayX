@@ -6,6 +6,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from BitArrayX import BitArrayX, BitArrayXException
 import unittest2
+from sys import version_info
 
 
 def load_truth_table(filename):
@@ -39,8 +40,12 @@ if __name__ == '__main__':
                 BitArrayX('0b0x0', 2)
             with self.assertRaises(BitArrayXException):
                 BitArrayX('0b0q0', 2)
+            with self.assertRaises(BitArrayXException):
+                BitArrayX('0b0000', 3)
 
         def test_constructor_correctness(self):
+            x = BitArrayX()
+            self.assertEqual(len(x), 0)
             x = BitArrayX(15)
             self.assertEqual(x, 15)
             self.assertEqual(len(x), 4)
@@ -110,6 +115,8 @@ if __name__ == '__main__':
             self.assertTrue(x[3] == BitArrayX.true())
             self.assertEqual(x[0:2], BitArrayX('0b10'))
             self.assertEqual(x[0:3], BitArrayX('0b010'))
+            self.assertEqual(x[:0], BitArrayX())
+            self.assertEqual(x[3:2], BitArrayX())
             with self.assertRaises(IndexError):
                 x[5]
 
@@ -119,10 +126,18 @@ if __name__ == '__main__':
             self.assertEqual(x, BitArrayX('0b101xx'))
             x[0:2] = BitArrayX('0b00')
             self.assertEqual(x, BitArrayX('0b10100'))
+            x[:] = BitArrayX('0b0001')
+            self.assertEqual(x, BitArrayX('0b0001'))
+            x = BitArrayX('0b1010')
+            x[:0] = BitArrayX('0b0001')
+            self.assertEqual(x, BitArrayX('0b10100001'))
 
         def test_conversions(self):
             x = BitArrayX('0b1010')
-            self.assertEqual(oct(x), '012')
+            if version_info.major == 2:
+                self.assertEqual(oct(x), '012')
+            else:
+                self.assertEqual(oct(x), '0o12')
             self.assertEqual(hex(x), '0xa')
 
 

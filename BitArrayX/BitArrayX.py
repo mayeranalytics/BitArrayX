@@ -1,45 +1,65 @@
 #!/usr/bin/env python2
+""" BitArrayX is a pure python module for easy manipulation of
+arrays of *extended boolean logic*. """
+
 __author__ = 'mmayer'
 
 import re
 
 
 class BitArrayXException(Exception):
+    """Exception class for BitArrayX."""
+
     pass
 
 
 class BitArrayX(object):
-    """ Simple operations on bit arrays
-    """
+    """Simple operations on bit arrays."""
 
-    _re_string = re.compile(r"^\s*(0b[01x\?_]+|0o[0-7_]+|0x[0-9aAbBcCdDeEfF_]+)\s*$")
+    _re_string = re.compile(
+        r"^\s*(0b[01x\?_]+|0o[0-7_]+|0x[0-9aAbBcCdDeEfF_]+)\s*$")
 
-    _and = {'0': {'0':'0', '1':'0', 'x':'0'}, '1': {'0':'0', '1':'1', 'x':'x'}, 'x': {'0':'0', '1':'x', 'x':'x'}}
-    _or  = {'0': {'0':'0', '1':'1', 'x':'x'}, '1': {'0':'1', '1':'1', 'x':'1'}, 'x': {'0':'x', '1':'1', 'x':'x'}}
-    _xor = {'0': {'0':'0', '1':'1', 'x':'x'}, '1': {'0':'1', '1':'0', 'x':'x'}, 'x': {'0':'x', '1':'x', 'x':'x'}}
+    _and = {'0': {'0':'0', '1':'0', 'x':'0'},
+            '1': {'0':'0', '1':'1', 'x':'x'},
+            'x': {'0':'0', '1':'x', 'x':'x'}}
+    _or  = {'0': {'0':'0', '1':'1', 'x':'x'},
+            '1': {'0':'1', '1':'1', 'x':'1'},
+            'x': {'0':'x', '1':'1', 'x':'x'}}
+    _xor = {'0': {'0':'0', '1':'1', 'x':'x'},
+            '1': {'0':'1', '1':'0', 'x':'x'},
+            'x': {'0':'x', '1':'x', 'x':'x'}}
     _not = {'0': '1', '1':'0', 'x':'x'}
 
     @staticmethod
     def undef():
+        """Return an 'x'."""
         return BitArrayX('0bx')
 
     @staticmethod
     def true():
+        """Return a 1."""
         return BitArrayX('0b1')
 
     @staticmethod
     def false():
+        """Return a 0."""
         return BitArrayX('0b')
 
-    def __init__(self, x, array_len=None):
-        """ Construct BitArrayX
-        :param x:
-        :param array_len:
-        :return:
+    def __init__(self, x=None, array_len=None):
+        """Init BitArrayX.
+
+        BitArrayX() -> new empty bit array,
+        BitArrayX(string) -> initialised from string 0b..., 0o..., 0x...
+        :param x:   string
+        :param array_len: desired length of string
         """
         self._array = ''        # bit arrays are stored as strings of '0', '1', 'x'
 
-        # validate the properness of the input and convert to a positive int if necessary
+        if x is None:
+            self._array = ''
+            return
+
+        # validate the properness of the input and convert to a number_string
         if isinstance(x, int):
             if x < 0:
                 raise BitArrayXException("BitArrayX: Cannot instantiate from '{}': Negative number.".format(str(x)))
@@ -72,37 +92,47 @@ class BitArrayX(object):
         self._array = '0'*(array_len-len(number_string)) + number_string
 
     def __len__(self):
+        """Returns length of BitArrayX."""
         return len(self._array)
 
     def __int__(self):
-        'x.__int__() <==> int(x)'
+        """<==> int(x)."""
         try:
             return eval('0b'+self._array)
-        except SyntaxError as e:
-            # by construction this can only happen if _array has a 'x'. In this case the value is undef,
-            # but we must raise an exception because __int__ must return an integer.
+        except SyntaxError:
+            # by construction this can only happen if _array has a 'x'.
+            # In this case the value is undef but we must raise an exception
+            # because __int__ must return an integer.
             raise BitArrayXException("{} is not an integer".format(self._array))
 
+    def __index__(self):
+        """Return self converted to an integer, if self is suitable for use as an index into a list.."""
+        return self.__int__()
+
     def __str__(self):
+        """Return a 0b... string."""
         return '0b'+self._array
 
     def __repr__(self):
         return 'BitArrayX(' + self._array + ')'
 
     def __add__(self, other):
+        """Concatenate with other BitArrayX."""
         return BitArrayX('0b' + self._array + other._array)
 
     def __mul__(self, n):
+        """Replicate n times."""
         return BitArrayX('0b' + self._array * n)
 
     def __eq__(self, other):
+        """Test for equality with other BitArray."""
         if isinstance(other, BitArrayX):
             return self._array == other._array
         else:
             return int(self) == other
 
     def __setitem__(self, key, item):
-        """ 'x[i, y] <==> x[i]=y' (but not x[i:j:step]=y) """
+        """'x[i, y] <==> x[i]=y' (but not x[i:j:step]=y)."""
         if item is not None and type(item).__name__ != 'BitArrayX':
             raise BitArrayXException("Can only assign BitArrayX, you tried to assign {}.".format(type(item).__name__))
 
@@ -148,54 +178,53 @@ class BitArrayX(object):
                 start = 0
             if stop is None:
                 stop = len(self)
-            return BitArrayX('0b' + self._array[::-1][start:stop][::-1])
+            s = self._array[::-1][start:stop][::-1]
+            return BitArrayX('0b' + s) if s else BitArrayX()
 
 
     def toList(self):
-        """ Convert bitarray to a list of 0, 1, None.
-
-            Note: This may have to be revisited when 'z' is introduced! """
+        """Convert bitarray to a list of 0, 1, None.
+        Note: This may have to be revisited when 'z' is introduced!"""
         return map(lambda x: 0 if x == '0' else 1 if x == '1' else None, self._array)
 
     def __xor__(self, other):
-        'x.__xor__(y) <==> x|y'
+        """<==> x^y logical xor."""
         return BitArrayX('0b' + ''.join(map(lambda x: BitArrayX._xor[x[0]][x[1]], zip(self._array, other._array))))
 
     def __and__(self, other):
-        'x.__and__(y) <==> x&y'
+        """<==> x&y logical and."""
         return BitArrayX('0b' + ''.join(map(lambda x: BitArrayX._and[x[0]][x[1]], zip(self._array, other._array))))
 
     def __or__(self, other):
-        'x.__or__(y) <==> x&y'
+        """<==> x|y logical or."""
         return BitArrayX('0b' + ''.join(map(lambda x: BitArrayX._or[x[0]][x[1]], zip(self._array, other._array))))
 
     def __invert__(self):
-        'x.__invert__() <==> ~x'
+        """<==> ~x the inverse."""
         return BitArrayX('0b' + ''.join(map(lambda x: BitArrayX._not[x], self._array)))
 
     def __lshift__(self, n):
-        'x.__lshift__(n) <==> x<<n'
+        """<==> x<<n logical shift left."""
         if n > len(self):
             return BitArrayX(0, len(self))
         else:
             return BitArrayX('0b'+self._array[n:len(self)]+'0'*n)
 
     def __rshift__(self, n):
-        'x.__rshift__(n) <==> x>>n'
+        """<==> x>>n logical shift right."""
         if n > len(self):
             return BitArrayX(0, len(self))
         else:
             return BitArrayX('0b' + '0'*n + self._array[0:(len(self)-n)])
 
     def __oct__(self):
-        'x.__oct__() <==> oct(x)'
+        """<==> oct(x) convert to octal."""
         return oct(int(self))
 
     def __hex__(self):
-        'x.__hex__() <==> hex(x)'
+        """<==> hex(x) convert to hex."""
         return hex(int(self))
 
     def __hash__(self):
         'x.__hash__() <==> hash(x)'
         return hash(self._array)
-

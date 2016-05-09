@@ -5,8 +5,8 @@
 BitArrayX is a pure python module for easy manipulation of 
  arrays of *extended boolean logic*.
 For most purpuses, in particular when you don't need extended logic,
-the [bitstring](http://pythonhosted.org/bitstring/) module 
-should be your first choice. It is extensive and well tested.
+the [bitstring](http://pythonhosted.org/bitstring/) and [bitarray](https://pypi.python.org/pypi/bitarray/0.8.1)
+modules should be your first choice. They are extensive and well tested.
 
 
 ### Extended logic ###
@@ -44,8 +44,15 @@ Secondly, the module may be extended
 to include the `z` truth value which represents a high impedance value
 in digital logic design. 
 
+
 # Motivation
-todo
+Extended logic becomes necessary when an indeterminate state has to be represented. Depending on the use case
+the indeterminate value can be interpreted as "don't know" or "don't care". In digital design it can represent
+a contaminated state.
+
+The goal of this module is to allow simple bit operations on bitstrings of extended logic. Simplicity is preferred
+over speed.
+
 
 # Documentation
 The module has two classes, `BitStringX` and `BitStringXException`.
@@ -53,7 +60,6 @@ The module has two classes, `BitStringX` and `BitStringXException`.
 ```python
 >>> from BitArrayX import *
 ```
-
 
 ### Constructors ###
 

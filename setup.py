@@ -3,7 +3,7 @@ __author__ = 'mmayer'
 from setuptools import setup
 
 setup(name='BitArrayX',
-      version='0.1',
+      version='0.2',
       description='BitArray with extended Boolean logic 0,1,x where "x" identifies an \
         unknown/undefined/contaminated value.',
       url='https://github.com/mayeranalytics/BitArrayX',
